@@ -43,11 +43,13 @@ class GeoScopeApp {
             hamburgerMenu: document.getElementById('hamburger-menu'),
             navMenu: document.getElementById('nav-menu'),
             overlay: document.getElementById('overlay'),
+            printButton: document.getElementById('print-button'),
         };
 
         // アプリケーションの状態を管理
         this.map = null;
         this.markers = new Map();
+        this.photoCounter = 0;
 
         // thisのコンテキストを束縛
         this._handleGeolocation = this._handleGeolocation.bind(this);
@@ -90,12 +92,23 @@ class GeoScopeApp {
         this.elements.hamburgerMenu.addEventListener('click', toggleMenu);
         this.elements.overlay.addEventListener('click', toggleMenu);
 
+        // 印刷ボタンのイベントリスナー
+        if (this.elements.printButton) {
+            this.elements.printButton.addEventListener('click', (event) => {
+                event.preventDefault(); // リンクのデフォルト動作をキャンセル
+                // メニューを閉じてから印刷ダイアログを開く
+                toggleMenu();
+                // アニメーション完了後に印刷ダイアログを表示 (0.4s = 400ms)
+                setTimeout(() => window.print(), 400);
+            });
+        }
+
         // メニュー内のリンクをクリックしたときもメニューを閉じる
         this.elements.navMenu.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                // 外部リンクの場合は閉じないようにするなどの制御も可能
-                toggleMenu();
-            });
+            // 印刷ボタンには専用のリスナーを追加したため、ここでは除外する
+            if (link.id !== 'print-button') {
+                link.addEventListener('click', toggleMenu);
+            }
         });
     }
 
@@ -170,27 +183,36 @@ class GeoScopeApp {
         if (files.length === 0) return;
 
         for (const file of files) {
-            if (this.markers.has(file.name)) continue; // 重複ファイルをスキップ
-            await this._processFile(file);
+            if (this.markers.has(file.name)) continue;
+            // _processFileが成功した場合のみカウンターを増やす
+            const success = await this._processFile(file);
+            if (success) {
+                this.photoCounter++;
+            }
         }
     }
 
     /**
      * 個別のファイルを処理
      * @param {File} file - 処理対象のファイルオブジェクト
+     * @returns {Promise<boolean>} 処理の成否
      */
     async _processFile(file) {
         const coords = await this._getCoordsFromFile(file);
         if (!coords) {
             console.warn(`Coordinates not found in EXIF or filename for: ${file.name}`);
-            return;
+            return false;
         }
+
+        const photoNumber = this.photoCounter + 1;
 
         try {
             const dataUrl = await this._readFileAsDataURL(file);
-            this._addPhotoToMap(file.name, coords, dataUrl);
+            this._addPhotoToMap(file.name, coords, dataUrl, photoNumber);
+            return true;
         } catch (error) {
             console.error(`Error reading file: ${file.name}`, error);
+            return false;
         }
     }
 
@@ -257,12 +279,21 @@ class GeoScopeApp {
      * @param {string} filename - ファイル名
      * @param {number[]} coords - 座標 [lat, lng]
      * @param {string} dataUrl - 画像のData URL
+     * @param {number} photoNumber - 写真の通し番号
      */
-    _addPhotoToMap(filename, coords, dataUrl) {
-        const marker = L.marker(coords).addTo(this.map);
-        marker.bindPopup(`<b>${filename}</b><br><img src="${dataUrl}" style="width:200px; height:auto;"/>`);
+    _addPhotoToMap(filename, coords, dataUrl, photoNumber) {
+        const icon = L.divIcon({
+            className: 'custom-div-icon',
+            html: `<div class="marker-pin"></div><div class="marker-number">${photoNumber}</div>`,
+            iconSize: [30, 42],
+            iconAnchor: [15, 42],
+            popupAnchor: [0, -42]
+        });
 
-        const thumbnailItem = this._createThumbnail(filename, coords, dataUrl, marker);
+        const marker = L.marker(coords, { icon: icon }).addTo(this.map);
+        marker.bindPopup(`<b>${photoNumber}. ${filename}</b><br><img src="${dataUrl}" style="width:200px; height:auto;"/>`);
+
+        const thumbnailItem = this._createThumbnail(filename, coords, dataUrl, marker, photoNumber);
 
         this.markers.set(filename, marker);
         this.elements.thumbnailsContainer.appendChild(thumbnailItem);
@@ -274,21 +305,32 @@ class GeoScopeApp {
      * @param {number[]} coords - 座標 [lat, lng]
      * @param {string} dataUrl - 画像のData URL
      * @param {L.Marker} marker - 対応するマーカー
+     * @param {number} photoNumber - 写真の通し番号
      * @returns {HTMLElement} 作成されたサムネイル要素
      */
-    _createThumbnail(filename, coords, dataUrl, marker) {
+    _createThumbnail(filename, coords, dataUrl, marker, photoNumber) {
         const thumbnailItem = document.createElement('div');
         thumbnailItem.className = 'thumbnail-item';
+
+        const header = document.createElement('div');
+        header.className = 'thumbnail-header';
+
+        const numberSpan = document.createElement('span');
+        numberSpan.className = 'thumbnail-number';
+        numberSpan.textContent = photoNumber;
+
+        const text = document.createElement('p');
+        text.className = 'thumbnail-filename';
+        text.textContent = filename;
+        header.appendChild(numberSpan);
+        header.appendChild(text);
 
         const img = document.createElement('img');
         img.src = dataUrl;
         img.alt = filename;
 
-        const text = document.createElement('p');
-        text.textContent = filename;
-
+        thumbnailItem.appendChild(header);
         thumbnailItem.appendChild(img);
-        thumbnailItem.appendChild(text);
 
         thumbnailItem.addEventListener('click', () => {
             this.map.flyTo(coords, GeoScopeApp.DEFAULT_ZOOM);

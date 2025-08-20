@@ -289,7 +289,6 @@ input[type="file"] {
     border-radius: 8px;
     background-color: var(--tertiary-bg-color);
     transition: background-color 0.3s, transform 0.2s;
-    text-align: left;
 }
 
 .thumbnail-item:hover {
@@ -297,20 +296,70 @@ input[type="file"] {
     transform: scale(1.02);
 }
 
+.thumbnail-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.thumbnail-number {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.thumbnail-item:hover .thumbnail-number {
+    background-color: white;
+    color: var(--accent-color);
+}
+
 .thumbnail-item img {
     width: 100%;
     height: auto;
     border-radius: 5px;
-    margin-bottom: 5px;
     display: block;
 }
 
-.thumbnail-item p {
+.thumbnail-filename {
     margin: 0;
     font-size: 0.8rem;
-    word-wrap: break-word;
-    text-align: left;
     color: var(--primary-text-color);
+    /* 長いファイル名を省略表示 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Leafletカスタムマーカーのスタイル */
+.marker-pin {
+    width: 30px;
+    height: 30px;
+    border-radius: 50% 50% 50% 0;
+    background: var(--accent-color);
+    position: absolute;
+    transform: rotate(-45deg);
+    border: 1px solid white;
+    box-shadow: -2px 2px 5px rgba(0,0,0,0.3);
+}
+
+.marker-number {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
 }
 
 /* Leafletポップアップのスタイル */
@@ -456,5 +505,53 @@ input[type="file"] {
     #thumbnails {
         /* 横向きではサムネイルエリアの幅を少し狭くする */
         flex-basis: 250px;
+    }
+}
+
+/* --- 印刷用スタイル --- */
+@media print {
+    /* 印刷時はインクを節約するため、白背景・黒文字に変更 */
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        padding: 10px; /* 印刷マージン */
+    }
+
+    #thumbnails,
+    .thumbnail-item,
+    .leaflet-popup-content-wrapper,
+    .leaflet-popup-tip {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+
+    /* サムネイル内の文字やポップアップ内の文字色も変更 */
+    .thumbnail-filename,
+    .leaflet-popup-content b {
+        color: #000000 !important;
+    }
+
+    /* 印刷に不要なUI要素を非表示にする */
+    .main-header,
+    #nav-menu,
+    #overlay,
+    .file-input-wrapper,
+    .description,
+    button,
+    .file-input-label,
+    footer,
+    .leaflet-control-zoom,
+    .leaflet-control-layers {
+        display: none !important;
+    }
+
+    #container {
+        display: block; /* flexレイアウトを解除 */
+    }
+
+    #map, #thumbnails {
+        page-break-inside: avoid; /* 要素がページをまたいで分割されるのを防ぐ */
+        box-shadow: none !important;
+        border: 1px solid #cccccc; /* 境界線を追加 */
     }
 }
