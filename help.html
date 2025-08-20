@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoScope - 使い方</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/fumifum1/main/main/jpg/ico.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Zen+Dots&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="gs.css">
+    <style>
+        /* ヘルプページ専用のスタイル */
+        body {
+            padding: 20px 40px;
+        }
+        .help-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--secondary-bg-color);
+            padding: 30px;
+            border-radius: 8px;
+        }
+        .help-container h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--primary-text-color);
+            text-align: left;
+        }
+        .help-container h1 .white-o {
+            color: var(--accent-color);
+        }
+        .help-container h2 {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        .help-container p, .help-container li {
+            color: var(--primary-text-color);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            text-align: left; /* pタグの中央寄せを上書き */
+        }
+        .help-container ul, .help-container ol {
+            padding-left: 25px;
+        }
+        .help-container code {
+            background-color: var(--tertiary-bg-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="help-container">
+        <h1><span class="white-o">＝</span>Ge<span class="white-o">o</span>Sc<span class="white-o">o</span>pe<span class="white-o">＝</span> 使い方</h1>
+
+        <h2>1. アプリケーションの開始</h2>
+        <p>最初の画面で、地図の表示方法を選択します。</p>
+        <ul>
+            <li><strong>現在地から始める:</strong> ブラウザの位置情報を使用して、あなたの現在地を中心とした地図を表示します。</li>
+            <li><strong>指定された座標から始める:</strong> デフォルトの座標（東京都庁）を中心とした地図を表示します。座標入力欄に任意の緯度・経度を入力して開始することも可能です。</li>
+        </ul>
+
+        <h2>2. 写真の追加</h2>
+        <p>メイン画面の「写真を選択」ボタンをクリックして、地図に表示したい写真ファイルを選択します。複数選択も可能です。</p>
+        <p>座標の読み取りは、以下の優先順位で行われます。</p>
+        <ol>
+            <li><strong>写真のEXIF情報:</strong> 写真ファイルにGPS位置情報が埋め込まれている場合、その座標を自動で読み取ります。スマートフォンで撮影した写真などに便利です。</li>
+            <li><strong>ファイル名:</strong> EXIF情報がない場合、ファイル名から座標を読み取ります。ファイル名を <code>photo_緯度_経度.jpg</code> (例: <code>photo_35.6895_139.6917.jpg</code>) のように設定してください。</li>
+        </ol>
+
+        <h2>3. 地図とサムネイルの操作</h2>
+        <ul>
+            <li><strong>マーカー:</strong> 写真が追加されると、地図上にマーカーが表示されます。マーカーをクリックすると、写真のプレビューが表示されます。</li>
+            <li><strong>サムネイル:</strong> 右側のエリアには、追加した写真のサムネイルが一覧で表示されます。サムネイルをクリックすると、地図がその写真の場所に移動し、マーカーのプレビューが開きます。</li>
+        </ul>
+
+        <h2>4. 地図デザインの変更</h2>
+        <p>地図の右上に表示されるレイヤーコントロールから、地図のデザインを「Standard (標準)」「Dark (ダーク)」「Satellite (衛星写真)」の3種類に切り替えることができます。</p>
+        <footer>
+            &copy; 2025.08 ver1.0 GeoScope <a href="https://fumifum1.github.io/main/index.html">Creator/fumifumi</a>
+        </footer>
+    </div>
+</body>
+</html>

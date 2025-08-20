@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoScope - Your Geographic Photo Gallery</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/fumifum1/main/main/jpg/ico.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Zen+Dots&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="gs.css" />
+</head>
+<body>
+    <div id="welcome-screen">
+        <h1><span class="white-o">＝</span>Ge<span class="white-o">o</span>Sc<span class="white-o">o</span>pe<span class="white-o">＝</span></h1>
+        <p>地図の表示方法を選んでください</p>
+        <button id="use-geolocation">現在地から始める</button>
+        <button id="use-default-location">指定された座標から始める</button>
+        <div id="input-coords-container" style="display: none;">
+            <p>👇 以下の欄に座標を入力してください</p>
+            <input type="text" id="latInput" placeholder="緯度 (例: 35.6895)">
+            <input type="text" id="lngInput" placeholder="経度 (例: 139.6917)">
+            <button id="submitCoords">地図を表示</button>
+        </div>
+        <footer>
+            &copy; 2025.08 ver1.0 GeoScope <a href="https://fumifum1.github.io/main/index.html">Creator/fumifumi</a>
+        </footer>
+    </div>
+
+    <div id="main-content" style="display: none;">
+        <header class="main-header">
+            <h1><span class="white-o">＝</span>Ge<span class="white-o">o</span>Sc<span class="white-o">o</span>pe<span class="white-o">＝</span></h1>
+            <div id="hamburger-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </header>
+        <nav id="nav-menu">
+            <ul>
+                <li><a href="#">バージョン: 1.0</a></li>
+                <li><a href="help.html" target="_blank" rel="noopener noreferrer">使い方</a></li>
+                <li><a href="https://fumifum1.github.io/main/index.html" target="_blank" rel="noopener noreferrer">製作者サイト</a></li>
+            </ul>
+        </nav>
+        <div id="overlay"></div>
+        <div class="content-body">
+            <div class="file-input-wrapper">
+                <label for="fileInput" class="file-input-label">写真を選択</label>
+                <input type="file" id="fileInput" multiple accept="image/*" />
+            </div>
+            <p class="description">写真のEXIF情報から座標を自動で読み取ります。<br>EXIF情報がない場合は、ファイル名から座標を読み取ります (例: `photo_35.6895_139.6917.jpg`)。</p>
+            <div id="container">
+                <div id="map"></div>
+                <div id="thumbnails"></div>
+            </div>
+        </div>
+        <footer>
+            &copy; 2025.08 ver1.0 GeoScope <a href="https://fumifum1.github.io/main/index.html">Creator/fumifumi</a>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/lite.umd.js"></script>
+    <script src="gs.js"></script>
+</body>
+</html>

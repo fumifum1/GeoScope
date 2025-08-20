@@ -1,0 +1,419 @@
+/* CSSカスタムプロパティでカラーパレットとスタイルを定義 */
+:root {
+    --primary-bg-color: #1a1a1a;
+    --secondary-bg-color: #2c2c2c;
+    --tertiary-bg-color: #444;
+    --primary-text-color: #ffffff;
+    --secondary-text-color: #a0a0a0;
+    --accent-color: #007bff;
+    --accent-color-hover: #0056b3;
+    --border-color: #555;
+    --shadow-color: rgba(0, 0, 0, 0.5);
+    --font-family: 'Roboto', sans-serif;
+}
+
+body {
+    font-family: var(--font-family);
+    background-color: var(--primary-bg-color);
+    color: var(--primary-text-color);
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-family: 'Zen Dots', sans-serif;
+    color: var(--accent-color);
+    text-align: center;
+    font-weight: 400; /* Zen DotsはRegular 400のみ対応 */
+    letter-spacing: 2px;
+    margin-bottom: 0.5em;
+}
+
+h1 .white-o {
+    color: #3625cf; /* ここで好きな色を指定 */
+}
+
+p {
+    color: var(--secondary-text-color);
+    text-align: center;
+}
+
+footer {
+    padding: 20px 0;
+    text-align: center;
+    color: var(--secondary-text-color);
+    font-size: 0.8rem;
+}
+
+footer a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+footer a:hover {
+    color: var(--accent-color-hover);
+    text-decoration: underline;
+}
+
+/* ウェルカム画面 */
+#welcome-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: calc(100vh - 40px); /* paddingを考慮 */
+}
+
+#welcome-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+#welcome-screen p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+/* 共通ボタンスタイル */
+button, .file-input-label {
+    font-size: 1.1rem;
+    padding: 12px 25px;
+    margin: 10px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 700;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    display: inline-block; /* labelのために必要 */
+}
+
+button:hover, .file-input-label:hover {
+    background-color: var(--accent-color-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+/* 座標入力 */
+#input-coords-container {
+    margin-top: 20px;
+    background-color: var(--secondary-bg-color);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+    width: 100%;
+    max-width: 500px;
+}
+
+input[type="text"] {
+    padding: 10px;
+    margin: 5px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--tertiary-bg-color);
+    color: var(--primary-text-color);
+    font-size: 1rem;
+    width: calc(50% - 32px); /* 左右に並べるための調整 */
+}
+
+/* メインコンテンツ */
+#main-content {
+    /* text-alignはcontent-bodyに移動 */
+}
+
+.content-body {
+    text-align: center;
+}
+
+.description {
+    margin-top: 5px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+/* ヘッダー */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 0 10px;
+    margin-bottom: 10px;
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+/* ハンバーガーメニュー */
+#hamburger-menu {
+    width: 30px;
+    height: 21px;
+    position: relative;
+    cursor: pointer;
+    z-index: 1001; /* メニューパネルより手前に */
+}
+
+#hamburger-menu span {
+    display: block;
+    width: 100%;
+    height: 3px;
+    background-color: var(--primary-text-color);
+    border-radius: 2px;
+    position: absolute;
+    transition: all 0.3s;
+}
+
+#hamburger-menu span:nth-child(1) { top: 0; }
+#hamburger-menu span:nth-child(2) { top: 9px; }
+#hamburger-menu span:nth-child(3) { top: 18px; }
+
+/* ハンバーガーメニュー active時 (×印) */
+#hamburger-menu.active span:nth-child(1) {
+    top: 9px;
+    transform: rotate(45deg);
+}
+#hamburger-menu.active span:nth-child(2) {
+    opacity: 0;
+}
+#hamburger-menu.active span:nth-child(3) {
+    top: 9px;
+    transform: rotate(-45deg);
+}
+
+/* ナビゲーションメニュー */
+#nav-menu {
+    position: fixed;
+    top: 0;
+    right: -300px; /* 初期状態は画面外 */
+    width: 300px;
+    max-width: 80%;
+    height: 100%;
+    background-color: var(--secondary-bg-color);
+    box-shadow: -5px 0 15px var(--shadow-color);
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1000;
+    padding-top: 80px;
+}
+
+#nav-menu.active {
+    right: 0; /* active時に画面内に表示 */
+}
+
+#nav-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#nav-menu li a {
+    display: block;
+    padding: 15px 25px;
+    color: var(--primary-text-color);
+    text-decoration: none;
+    font-size: 1.1rem;
+    transition: background-color 0.2s;
+}
+
+#nav-menu li a:hover {
+    background-color: var(--accent-color);
+}
+
+/* オーバーレイ */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s, visibility 0.4s;
+}
+
+#overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* カスタムファイル入力 */
+.file-input-wrapper {
+    margin-bottom: 10px;
+}
+
+input[type="file"] {
+    display: none; /* 標準のファイル入力を非表示 */
+}
+
+#container {
+    display: flex;
+    flex-wrap: wrap; /* 画面が小さい場合に折り返す */
+    gap: 20px;
+    margin-top: 20px;
+}
+
+#map {
+    height: 600px;
+    flex: 1; /* flexアイテムとして伸縮させる */
+    min-width: 300px; /* 最小幅 */
+    border-radius: 8px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+#thumbnails {
+    flex-basis: 350px; /* 基本の幅を指定 */
+    flex-grow: 0;
+    flex-shrink: 0;
+    height: 600px;
+    overflow-y: auto;
+    background-color: var(--secondary-bg-color);
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px var(--shadow-color);
+}
+
+/* サムネイルアイテム */
+.thumbnail-item {
+    cursor: pointer;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: var(--tertiary-bg-color);
+    transition: background-color 0.3s, transform 0.2s;
+    text-align: left;
+}
+
+.thumbnail-item:hover {
+    background-color: var(--accent-color);
+    transform: scale(1.02);
+}
+
+.thumbnail-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.thumbnail-item p {
+    margin: 0;
+    font-size: 0.8rem;
+    word-wrap: break-word;
+    text-align: left;
+    color: var(--primary-text-color);
+}
+
+/* Leafletポップアップのスタイル */
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+    background: var(--secondary-bg-color);
+    color: var(--primary-text-color);
+    box-shadow: 0 3px 14px var(--shadow-color);
+}
+
+.leaflet-popup-content {
+    text-align: center;
+}
+
+.leaflet-popup-content img {
+    max-width: 200px;
+    height: auto;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+    color: var(--primary-text-color);
+}
+
+/* カスタムスクロールバー */
+#thumbnails::-webkit-scrollbar {
+    width: 8px;
+}
+
+#thumbnails::-webkit-scrollbar-track {
+    background: var(--secondary-bg-color);
+    border-radius: 10px;
+}
+
+#thumbnails::-webkit-scrollbar-thumb {
+    background-color: var(--tertiary-bg-color);
+    border-radius: 10px;
+    border: 2px solid var(--secondary-bg-color);
+}
+
+#thumbnails::-webkit-scrollbar-thumb:hover {
+    background-color: var(--border-color);
+}
+
+/* Leafletレイヤーコントロールのスタイル */
+.leaflet-control-layers {
+    background: var(--secondary-bg-color);
+    border-radius: 5px;
+    box-shadow: 0 1px 5px var(--shadow-color);
+    border: 1px solid var(--border-color);
+}
+
+.leaflet-control-layers-base label {
+    color: var(--primary-text-color);
+    display: flex; /* For alignment */
+    align-items: center;
+}
+
+.leaflet-control-layers-base label span {
+    padding-left: 8px; /* Space between radio and text */
+}
+
+.leaflet-control-layers-separator {
+    border-top: 1px solid var(--border-color);
+}
+
+/* --- レスポンシブ対応 --- */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+
+    #welcome-screen h1 {
+        font-size: 2.5rem;
+    }
+
+    #welcome-screen p {
+        font-size: 1rem;
+    }
+
+    /* 座標入力欄を縦に並べる */
+    #input-coords-container {
+        padding: 15px;
+    }
+
+    input[type="text"] {
+        width: calc(100% - 22px); /* paddingとborderを考慮 */
+        margin-bottom: 10px;
+    }
+
+    /* メインコンテンツのレイアウトを縦積みに変更 */
+    #container {
+        flex-direction: column;
+    }
+
+    #map {
+        height: 50vh; /* ビューポートの高さの50% */
+    }
+
+    #thumbnails {
+        flex-basis: auto; /* 基本幅をリセット */
+        width: 100%;
+        height: 40vh; /* ビューポートの高さの40% */
+    }
+}
