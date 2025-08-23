@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
           setTimeout(() => reject(new Error('カメラ映像の読み込みがタイムアウトしました。')), 10000);
         });
 
-        await this.setupZoom(); // ストリーム開始後にズームを設定
+        await this.setZoom(); // ストリーム開始後にズームを設定
         UI.updateStatus(`カメラが起動しました。(${videoWidth}x${videoHeight})`);
       } catch (err) {
         console.error('Error accessing camera: ', err);
@@ -229,32 +229,43 @@ document.addEventListener('DOMContentLoaded', (event) => {
         state.currentFacingMode = state.currentFacingMode === 'environment' ? 'user' : 'environment';
       }
     },
-    async setupZoom() {
-      if (!state.stream) return;
-      const [videoTrack] = state.stream.getVideoTracks();
-      const capabilities = videoTrack.getCapabilities();
-
-      if (capabilities.zoom) {
-        DOM.zoomSlider.min = capabilities.zoom.min;
-        DOM.zoomSlider.max = capabilities.zoom.max;
-        DOM.zoomSlider.step = capabilities.zoom.step;
-        DOM.zoomSlider.value = videoTrack.getSettings().zoom || capabilities.zoom.min;
-        DOM.zoomSlider.style.display = 'block';
-      } else {
-        DOM.zoomSlider.style.display = 'none';
-        console.log('Zoom is not supported by this device/track.');
-      }
-    },
-    async applyZoom(value) {
-      if (!state.stream) return;
-      const [videoTrack] = state.stream.getVideoTracks();
-      try {
-        await videoTrack.applyConstraints({
-          advanced: [{ zoom: parseFloat(value) }]
-        });
-      } catch (err) {
-        console.error('Error applying zoom:', err);
-      }
+    async setZoom() {
+        try {
+            const stream = DOM.video.srcObject;
+            if (!stream) return;
+    
+            const track = stream.getVideoTracks()[0];
+            if (!track) return;
+    
+            const capabilities = track.getCapabilities();
+    
+            // ズームがサポートされていない場合はスライダーを隠し、イベントをクリア
+            if (!('zoom' in capabilities)) {
+                DOM.zoomSlider.style.display = 'none';
+                DOM.zoomSlider.oninput = null; 
+                return;
+            }
+    
+            DOM.zoomSlider.style.display = 'block';
+            const { min, max, step } = capabilities.zoom;
+            DOM.zoomSlider.min = min;
+            DOM.zoomSlider.max = max;
+            DOM.zoomSlider.step = step;
+            DOM.zoomSlider.value = track.getSettings().zoom || min;
+    
+            // oninputイベントハンドラを直接上書き設定します。
+            // これにより、カメラ切替時も常に新しいカメラに正しく接続されます。
+            DOM.zoomSlider.oninput = () => {
+                const currentTrack = DOM.video.srcObject?.getVideoTracks()[0];
+                if (currentTrack) {
+                    currentTrack.applyConstraints({ zoom: parseFloat(DOM.zoomSlider.value) })
+                        .catch(e => console.error("ズーム処理に失敗しました:", e));
+                }
+            };
+        } catch (err) {
+            console.error('ズームスライダーの設定中にエラーが発生しました:', err);
+            DOM.zoomSlider.style.display = 'none';
+        }
     },
     requestGeolocation() {
       return new Promise((resolve) => {
@@ -460,7 +471,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
       DOM.menuContainer.addEventListener('click', (e) => e.stopPropagation());
 
       DOM.switchCameraButton.addEventListener('click', () => Device.switchCamera());
-      DOM.zoomSlider.addEventListener('input', (e) => Device.applyZoom(e.target.value));
 
       DOM.fileNameInput.addEventListener('input', () => Storage.saveInput(CONSTANTS.STORAGE_KEYS.FILE_NAME, DOM.fileNameInput.value));
       DOM.locationNameInput.addEventListener('input', () => Storage.saveInput(CONSTANTS.STORAGE_KEYS.LOCATION_NAME, DOM.locationNameInput.value));
