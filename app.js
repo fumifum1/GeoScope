@@ -88,7 +88,68 @@ document.addEventListener('DOMContentLoaded', (event) => {
     resetCounter() {
       state.shotCount = 0;
       DOM.counterElement.textContent = '';
-    }
+    },
+    createPermissionDialog() {
+      if (document.getElementById('location-permission-dialog')) return;
+
+      const dialogHTML = `
+        <div id="location-permission-dialog" class="permission-dialog">
+            <div class="permission-dialog-content">
+                <h3>位置情報の利用について</h3>
+                <p>撮影した写真に正確な位置情報を記録するために、現在地の利用許可をお願いします。</p>
+                <p class="dialog-note">この情報は写真のファイル名や画像内の情報として利用されます。</p>
+                <div class="permission-dialog-buttons">
+                    <button id="permission-deny-btn" class="dialog-btn deny">あとで</button>
+                    <button id="permission-allow-btn" class="dialog-btn allow">許可する</button>
+                </div>
+            </div>
+        </div>
+      `;
+      document.body.insertAdjacentHTML('beforeend', dialogHTML);
+
+      const style = document.createElement('style');
+      style.textContent = `
+        .permission-dialog {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: none; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        .permission-dialog-content {
+            background-color: #fff; padding: 24px; border-radius: 8px;
+            text-align: center; max-width: 90%; width: 340px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .permission-dialog-content h3 { margin-top: 0; color: #333; }
+        .permission-dialog-content p { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+        .permission-dialog-content .dialog-note { font-size: 12px; color: #777; }
+        .permission-dialog-buttons { margin-top: 24px; display: flex; justify-content: space-around; }
+        .dialog-btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; min-width: 100px; }
+        .dialog-btn.deny { background-color: #f0f0f0; color: #333; }
+        .dialog-btn.allow { background-color: #007bff; color: #fff; }
+      `;
+      document.head.appendChild(style);
+    },
+    handlePermissionChoice() {
+      return new Promise((resolve) => {
+        const dialog = document.getElementById('location-permission-dialog');
+        const allowBtn = document.getElementById('permission-allow-btn');
+        const denyBtn = document.getElementById('permission-deny-btn');
+
+        if (!dialog || !allowBtn || !denyBtn) return resolve(true); // ダイアログがない場合は通常フロー
+
+        const listener = (e) => {
+          dialog.style.display = 'none';
+          allowBtn.removeEventListener('click', listener);
+          denyBtn.removeEventListener('click', listener);
+          resolve(e.target.id === 'permission-allow-btn');
+        };
+
+        allowBtn.addEventListener('click', listener);
+        denyBtn.addEventListener('click', listener);
+        dialog.style.display = 'flex';
+      });
+    },
   };
 
   // --- LocalStorage関連の処理 ---
@@ -142,54 +203,20 @@ document.addEventListener('DOMContentLoaded', (event) => {
       }
       DOM.video.srcObject = null;
     },
-    getLocation() {
-      return new Promise((resolve) => {
-        if (!navigator.geolocation) {
-          UI.appendStatus(' (位置情報機能はサポートされていません)');
-          resolve(); // サポートされていなくても処理は続行
-          return;
-        }
+    async getLocation() {
+      if (!navigator.geolocation) {
+        UI.appendStatus(' (位置情報機能はサポートされていません)');
+        return;
+      }
 
-        const geoOptions = {
-          enableHighAccuracy: false, // まずは低精度で素早く試す
-          timeout: 10000,          // 10秒でタイムアウト
-          maximumAge: 60000        // 1分以内のキャッシュされた位置情報を使う
-        };
+      const userAllowed = await UI.handlePermissionChoice();
 
-        navigator.geolocation.getCurrentPosition(
-          // 成功時のコールバック
-          (position) => {
-            state.coords.lat = position.coords.latitude;
-            state.coords.lon = position.coords.longitude;
-            UI.appendStatus(' (位置情報取得済み ✅)');
-            resolve();
-          },
-          // 失敗時のコールバック
-          (error) => {
-            console.error('Geolocation error: ', error);
-            let errorMessage = ' (位置情報取得失敗: ';
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                errorMessage += '許可されませんでした)';
-                alert('位置情報の使用が許可されていません。\nブラウザやスマートフォンの設定を確認してください。');
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMessage += '位置を特定できません)';
-                break;
-              case error.TIMEOUT:
-                errorMessage += 'タイムアウトしました)';
-                break;
-              default:
-                errorMessage += '不明なエラー)';
-                break;
-            }
-            UI.appendStatus(errorMessage);
-            resolve(); // エラーでも処理を続行するため resolve する
-          },
-          // オプション
-          geoOptions
-        );
-      });
+      if (userAllowed) {
+        UI.updateStatus('位置情報を取得しています...');
+        await this.requestGeolocation();
+      } else {
+        UI.appendStatus(' (位置情報は利用しません)');
+      }
     },
     async switchCamera() {
       state.currentFacingMode = state.currentFacingMode === 'environment' ? 'user' : 'environment';
@@ -228,6 +255,46 @@ document.addEventListener('DOMContentLoaded', (event) => {
       } catch (err) {
         console.error('Error applying zoom:', err);
       }
+    },
+    requestGeolocation() {
+      return new Promise((resolve) => {
+        const geoOptions = {
+          enableHighAccuracy: false,
+          timeout: 10000,
+          maximumAge: 60000
+        };
+
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            state.coords.lat = position.coords.latitude;
+            state.coords.lon = position.coords.longitude;
+            UI.appendStatus(' (位置情報取得済み ✅)');
+            resolve();
+          },
+          (error) => {
+            console.error('Geolocation error: ', error);
+            let errorMessage = ' (位置情報取得失敗: ';
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage += '許可されませんでした)';
+                alert('位置情報の使用がブラウザまたはOSレベルでブロックされています。設定を確認してください。');
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMessage += '位置を特定できません)';
+                break;
+              case error.TIMEOUT:
+                errorMessage += 'タイムアウトしました)';
+                break;
+              default:
+                errorMessage += '不明なエラー)';
+                break;
+            }
+            UI.appendStatus(errorMessage);
+            resolve(); // エラーでも処理を続行
+          },
+          geoOptions
+        );
+      });
     }
   };
 
@@ -403,6 +470,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
 
   // --- アプリケーション初期化 ---
   function init() {
+    UI.createPermissionDialog();
     UI.showScreen('start');
     Storage.loadInputs();
     Handlers.setupEventListeners();
