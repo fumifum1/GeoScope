@@ -10,13 +10,13 @@
     <style>
         /* ヘルプページ専用のスタイル */
         body {
-            padding: 20px 40px;
+            /* padding: 20px 40px; */
         }
         .help-container {
             max-width: 800px;
-            margin: 0 auto;
+            margin: 20px auto;
             background-color: var(--secondary-bg-color);
-            padding: 30px;
+            padding: 30px 40px;
             border-radius: 8px;
         }
         .help-container h1 {
@@ -49,9 +49,76 @@
             border-radius: 4px;
             font-family: monospace;
         }
+
+        /* --- Header/Menu Styles --- */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 40px;
+            background-color: var(--secondary-bg-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+        .main-header .logo a {
+            font-family: 'Zen Dots', cursive;
+            font-size: 1.8rem;
+            color: var(--primary-text-color);
+            text-decoration: none;
+        }
+        .main-header .logo .white-o {
+            color: var(--accent-color);
+        }
+        .main-header nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .main-header nav li {
+            margin-left: 20px;
+        }
+        .main-header nav a {
+            color: var(--primary-text-color);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 400;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .main-header nav a:hover,
+        .main-header nav a.active {
+            background-color: var(--accent-color);
+            color: var(--secondary-bg-color);
+        }
+        footer {
+            text-align: center;
+            padding: 20px 40px;
+            margin-top: 40px;
+            color: var(--primary-text-color);
+            font-size: 0.9rem;
+        }
+        footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
+    <header class="main-header">
+        <div class="logo">
+            <a href="GeoScope.html">Ge<span class="white-o">o</span>Sc<span class="white-o">o</span>pe</a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="GeoScope.html">アプリに戻る</a></li>
+                <li><a href="help.html" class="active">使い方</a></li>
+            </ul>
+        </nav>
+    </header>
     <div class="help-container">
         <h1><span class="white-o">＝</span>Ge<span class="white-o">o</span>Sc<span class="white-o">o</span>pe<span class="white-o">＝</span> 使い方</h1>
 
@@ -78,9 +145,9 @@
 
         <h2>4. 地図デザインの変更</h2>
         <p>地図の右上に表示されるレイヤーコントロールから、地図のデザインを「Standard (標準)」「Dark (ダーク)」「Satellite (衛星写真)」の3種類に切り替えることができます。</p>
-        <footer>
-            &copy; 2025 Synapse Creations. Aug.GeoScope ver1.0.1 <a href="https://fumifum1.github.io/main/index.html">Creator/fumifumi</a>
-        </footer>
     </div>
+    <footer>
+        &copy; 2025 Synapse Creations. Aug.GeoScope ver1.0.1 <a href="https://fumifum1.github.io/main/index.html">Creator/fumifumi</a>
+    </footer>
 </body>
 </html>
