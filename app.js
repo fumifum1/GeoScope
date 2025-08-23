@@ -145,22 +145,49 @@ document.addEventListener('DOMContentLoaded', (event) => {
     getLocation() {
       return new Promise((resolve) => {
         if (!navigator.geolocation) {
-          UI.appendStatus(' (このブラウザは位置情報をサポートしていません)');
-          resolve();
+          UI.appendStatus(' (位置情報機能はサポートされていません)');
+          resolve(); // サポートされていなくても処理は続行
           return;
         }
+
+        const geoOptions = {
+          enableHighAccuracy: false, // まずは低精度で素早く試す
+          timeout: 10000,          // 10秒でタイムアウト
+          maximumAge: 60000        // 1分以内のキャッシュされた位置情報を使う
+        };
+
         navigator.geolocation.getCurrentPosition(
+          // 成功時のコールバック
           (position) => {
             state.coords.lat = position.coords.latitude;
             state.coords.lon = position.coords.longitude;
             UI.appendStatus(' (位置情報取得済み ✅)');
             resolve();
           },
+          // 失敗時のコールバック
           (error) => {
             console.error('Geolocation error: ', error);
-            UI.appendStatus(' (位置情報の取得に失敗しました。)');
+            let errorMessage = ' (位置情報取得失敗: ';
+            switch (error.code) {
+              case error.PERMISSION_DENIED:
+                errorMessage += '許可されませんでした)';
+                alert('位置情報の使用が許可されていません。\nブラウザやスマートフォンの設定を確認してください。');
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMessage += '位置を特定できません)';
+                break;
+              case error.TIMEOUT:
+                errorMessage += 'タイムアウトしました)';
+                break;
+              default:
+                errorMessage += '不明なエラー)';
+                break;
+            }
+            UI.appendStatus(errorMessage);
             resolve(); // エラーでも処理を続行するため resolve する
-          }
+          },
+          // オプション
+          geoOptions
         );
       });
     },
