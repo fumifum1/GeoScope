@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QuickShot-記録写真アプリ-</title>
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/fumifum1/main/main/jpg/ico.ico">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div id="start-screen" class="screen">
+        <h1>QuickShot</h1>
+        <p>全画面カメラで記録写真を撮影します。<br>
+        起動後、メニューボタンで情報を入力してください。</p>
+        <p>このQuickShotで撮影した写真を地図に落としたい場合は、<br>
+            <a href="https://fumifum1.github.io/GeoScope/GeoScope.html">『GeoScope』</a>でマッピングできます。</p>
+        <button id="startButton">Start-up</button>
+    <footer>
+        &copy; 2025 Synapse Creations. Aug.QuickShot_ver1.2.2 <a href="https://fumifum1.github.io/main/index.html">Creator/fumifumi</a>
+    </footer>
+    </div>
+
+    <div id="camera-screen" class="screen">
+        <div id="menu-toggle"><i class="fas fa-bars"></i></div>
+        <div id="menu-overlay">
+            <div id="menu-container">
+                <input type="text" id="fileName" placeholder="ファイル名 (例: 現場写真-01)">
+                <input type="text" id="locationName" placeholder="場所名 (例: 工事現場A)">
+                <textarea id="memoText" placeholder="メモ (例: 鉄骨の錆びを確認)"></textarea>
+                <label for="photoSize">撮影サイズを選択:</label>
+                <select id="photoSize">
+                    <option value="1920x1080">フルHD (1920x1080)</option>
+                    <option value="1280x720">HD (1280x720)</option>
+                    <option value="800x600">SD (800x600)</option>
+                    <option value="640x480" selected>VGA (640x480)</option>
+                    <option value="480x360">低画質 (480x360)</option>
+                </select>
+                <div class="checkbox-container">
+                  <div>
+                    <input type="checkbox" id="showInfo" checked>
+                    <label for="showInfo">写真に情報を記録する</label>
+                  </div>
+                  <div>
+                   <input type="checkbox" id="showCoords" checked>
+                   <label for="showCoords">座標情報も記録する</label>
+                  </div>
+               </div>
+            </div>
+        </div>
+        
+        <video id="video" autoplay playsinline></video>
+        <button id="overlayButton">撮影</button>
+        <button id="stopButton"><i class="fas fa-times"></i></button>
+        <button id="switchCameraButton"><i class="fas fa-camera-rotate"></i></button>
+        <input type="range" id="zoom-slider">
+
+        <p id="status"></p>
+        <p id="counter"></p>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script src="app.js"></script>
+</body>
+</html>
